@@ -6,10 +6,21 @@ This library includes a subset of our API, tailored for API-first use cases. For
 
 A few simple examples of common usage patterns.
 
+```bash
+pip install operand
+```
+
+### Required Imports (for Below Examples)
+
+```python
+from operand.client import IndexClient, ObjectService, add_property, add_property_filter_condition, add_range_condition
+from operand.v1.index_pb2 import CreateIndexRequest
+from operand.v1.object_pb2 import ObjectType, UpsertRequest, SearchWithinRequest
+```
+
 ### Creating an Index
 
 ```python
-# import IndexClient, CreateIndexRequest
 client = IndexClient("https://api.operand.ai", "<your-api-key>")
 req = CreateIndexRequest()
 req.name = "my-index"
@@ -22,7 +33,6 @@ print(resp.index.public_id)
 ### Indexing A Text Object with Properties
 
 ```python
-# import ObjectService, UpsertRequest, ObjectType, add_property
 objectClient = ObjectService("https://api.operand.ai", "<your api key>", resp.index.public_id)
 req = UpsertRequest()
 req.type = ObjectType.OBJECT_TYPE_TEXT
@@ -38,7 +48,6 @@ print(resp)
 ### Doing a Semantic Search over an Index (with Optional Filters)
 
 ```python
-# import SearchRequest, add_property_filter_condition, add_range_condition
 req = SearchWithinRequest()
 req.query = "hello"
 add_property_filter_condition(req, "my-number-array", 3)

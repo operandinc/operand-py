@@ -48,7 +48,7 @@ resp = client.create_file(req)
 print(resp)
 ```
 
-### Doing a Semantic Search over an Index (with Optional Filters)
+### Searching over all folders (with Optional Filters)
 
 ```python
 client = OperandServiceClient("https://mcp.operand.ai/","API_KEY")

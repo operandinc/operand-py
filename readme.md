@@ -13,45 +13,49 @@ pip install operand
 ### Required Imports (for Below Examples)
 
 ```python
-from operand.client import IndexClient, ObjectService, add_property, add_property_filter_condition, add_range_condition
-from operand.v1.index_pb2 import CreateIndexRequest
-from operand.v1.object_pb2 import ObjectType, UpsertRequest, SearchWithinRequest
+from operand.client import FileServiceClient, OperandServiceClient, CreateFileRequest, CreateFileResponse, add_property, add_property_filter_condition, add_range_condition
+from operand.mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse
 ```
 
-### Creating an Index
+### Creating a folder
 
 ```python
-client = IndexClient("https://api.operand.ai", "<your-api-key>")
-req = CreateIndexRequest()
-req.name = "my-index"
-req.description = "Created by Python"
-req.public = False
-resp = client.create_index(req)
-print(resp.index.public_id)
+client = FileServiceClient("https://mcp.operand.ai/","API_KEY")
+req = CreateFileRequest(
+    # Names must be unique within a given folder
+    name="cool folder",
+)
+resp = client.create_file(req)
+print(resp)
 ```
 
-### Indexing A Text Object with Properties
+### Uploading a file
 
 ```python
-objectClient = ObjectService("https://api.operand.ai", "<your api key>", resp.index.public_id)
-req = UpsertRequest()
-req.type = ObjectType.OBJECT_TYPE_TEXT
-req.metadata.text.text = "Hello world"
+client = FileServiceClient("https://mcp.operand.ai/","API_KEY")
+req = CreateFileRequest(
+    # Names must be unique within a given folder
+    name="test.txt",
+    # The file contents as bytes
+    file=bytes("test", "utf-8")
+)
 add_property(req, "my-property", "my-value")
 add_property(req, "my-number", 123)
 add_property(req, "my-number-array", [1, 2, 3])
 add_property(req, "my-text-array", ["a", "b", "c"])
-resp = objectClient.upsert(req)
+
+resp = client.create_file(req)
 print(resp)
 ```
 
 ### Doing a Semantic Search over an Index (with Optional Filters)
 
 ```python
-req = SearchWithinRequest()
-req.query = "hello"
+client = OperandServiceClient("https://mcp.operand.ai/","API_KEY")
+req = SearchRequest()
+req.query = "test"
 add_property_filter_condition(req, "my-number-array", 3)
 add_range_condition(req, "my-number", gt=10)
-resp = objectClient.search_within(req)
+resp = oclient.search(req)
 print(resp)
 ```

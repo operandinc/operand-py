@@ -1,7 +1,8 @@
 import requests
 from google.protobuf.json_format import MessageToJson, Parse
-from mcp.file.v1.file_pb2 import CreateFileRequest, CreateFileResponse, GetFileRequest, GetFileResponse, ListFilesRequest, ListFilesResponse, DeleteFileRequest, DeleteFileResponse, UpdateFileRequest, UpdateFileResponse, Property, Properties
+from mcp.file.v1.file_pb2 import GetFileRequest, GetFileResponse, ListFilesRequest, ListFilesResponse, DeleteFileRequest, DeleteFileResponse, UpdateFileRequest, UpdateFileResponse, Property, Properties
 from mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse, Filter, Condition
+
 class OperandClient:
     """
     Used as a base class to provide common functionality for the various
@@ -10,7 +11,7 @@ class OperandClient:
 
     def __init__(self, endpoint, key):
         self.key = key
-        self.endpoint = endpoint or "https://mcp.operand.ai"
+        self.endpoint = endpoint
         if not self.endpoint.endswith("/"):
             self.endpoint += "/"
     
@@ -25,9 +26,30 @@ class OperandClient:
             headers.update(extra_headers)
         body = MessageToJson(body, preserving_proto_field_name=True, indent=None)
         resp = requests.post(url, headers=headers, data=body)
-        if resp.status_code != 200:
-            raise Exception("Operand request failed: " + resp.text)
-        return Parse(resp.text, resp_message, ignore_unknown_fields=True)
+        resp.raise_for_status()  # raises exception when not a 2xx response
+        if resp.status_code != 204:
+            return Parse(resp.text, resp_message, ignore_unknown_fields=True)
+
+class CreateFileRequest:
+    """
+    A special multipart-form request to create a file.
+    """
+    def __init__(self, name, file=None, parent_id=None , properties=None):
+        self.name = name 
+        # Optional
+        self.parent_id = parent_id        
+        self.file = file
+        self.properties = properties
+    
+class CreateFileResponse:
+    """
+    A special multipart-form request to create a file.
+    """
+    def __init__(self, id, name, parent_id, properties=None):
+        self.id = id
+        self.name = name
+        self.parent_id = parent_id
+        self.properties = properties
 
 
 class FileServiceClient(OperandClient):
@@ -39,13 +61,40 @@ class FileServiceClient(OperandClient):
         super().__init__(endpoint, key)
     
     def _req(self, method, body, resp_message):
-        return super()._req("mcp.file.v1.FileService", method, body, resp_message)
+        return super()._req("file.v1.FileService", method, body, resp_message)
     
     def create_file(self, req: CreateFileRequest) -> CreateFileResponse:
         """
-        Creates a new file.
+        A special multipart-form request to create a file.
         """
-        return self._req("CreateFile", req, CreateFileResponse())
+
+        # If the req.parent is not set, then we need to set it to the root folder.
+        if not req.parent_id:
+            req.parent_id = ""
+
+        # Construct the properties
+        
+
+        # Construct the multipart form request
+        body = {
+            "name": req.name,
+            "parent_id": req.parent_id,
+            "properties": MessageToJson(req.properties, preserving_proto_field_name=True, indent=None)
+        }
+        files = {
+            "file": req.file
+        }
+        headers = {
+            "Authorization": "Key "+ self.key
+        }
+        resp = requests.post(
+            self.endpoint + "upload",
+            headers=headers,
+            data=body,
+            files=files
+        )
+        return resp.json()
+        
     
     def get_file(self, req: GetFileRequest) -> GetFileResponse:
         """
@@ -81,12 +130,15 @@ class OperandServiceClient(OperandClient):
         super().__init__(endpoint, key)
     
     def _req(self, method, body, resp_message):
-        return super()._req("mcp.operand.v1.OperandService", method, body, resp_message)
+        return super()._req("operand.v1.OperandService", method, body, resp_message)
 
     def search(self, req: SearchRequest) -> SearchResponse:
         """
         Searches files.
         """
+        # If the req.parent is not set, then we need to set it to the root folder.
+        if not req.parent_id:
+            req.parent_id = ""
         return self._req("Search", req, SearchResponse())
 
 

@@ -66,15 +66,10 @@ class FileServiceClient(OperandClient):
     def create_file(self, req: CreateFileRequest) -> CreateFileResponse:
         """
         A special multipart-form request to create a file.
-        """
-
+         """
         # If the req.parent is not set, then we need to set it to the root folder.
         if not req.parent_id:
             req.parent_id = ""
-
-        # Construct the properties
-        
-
         # Construct the multipart form request
         body = {
             "name": req.name,

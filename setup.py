@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='operand',
-    version='0.1',
+    version='0.2',
     license='MIT',
     author="Operand, Inc.",
     author_email='support@operand.ai',

@@ -1,6 +1,6 @@
 import requests
 from google.protobuf.json_format import MessageToJson, Parse
-from mcp.file.v1.file_pb2 import GetFileRequest, GetFileResponse, ListFilesRequest, ListFilesResponse, DeleteFileRequest, DeleteFileResponse, UpdateFileRequest, UpdateFileResponse, Property, Properties
+from mcp.file.v1.file_pb2 import GetFileRequest, GetFileResponse, ListFilesRequest, ListFilesResponse, DeleteFileRequest, DeleteFileResponse, UpdateFileRequest, UpdateFileResponse, Property, Properties, CreateFileResponse
 from mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse, Filter, Condition
 
 class OperandClient:
@@ -64,8 +64,10 @@ class FileServiceClient(OperandClient):
         body = {
             "name": req.name,
             "parent_id": req.parent_id,
-            "properties": MessageToJson(req.properties, preserving_proto_field_name=True, indent=None)
         }
+        if req.properties:
+            body["properties"] = MessageToJson(req.properties, preserving_proto_field_name=True, indent=None)
+
         files = {
             "file": req.file
         }

@@ -2,14 +2,16 @@ from setuptools import setup
 
 setup(
     name='operand',
-    version='0.2',
+    version='0.2.2',
     license='MIT',
     author="Operand, Inc.",
     author_email='support@operand.ai',
-    packages=['operand', 'operand.v1'],
+    packages=['operand', 'mcp.operand.v1', 'mcp.file.v1', 'mcp.tenant.v1'],
     package_dir={
         'operand': '.',
-        'operand.v1': './operand/v1',
+        'mcp.operand.v1': './mcp/operand/v1',
+        'mcp.file.v1': './mcp/file/v1',
+        'mcp.tenant.v1': './mcp/tenant/v1',
     },
     url='https://github.com/operandinc/operand-py',
     keywords='semantic-search search nlp',

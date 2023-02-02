@@ -15,7 +15,8 @@ pip install operand
 ```python
 import os
 from operand.client import FileServiceClient, OperandServiceClient, CreateFileRequest, add_property, add_property_filter_condition, add_range_condition
-from operand.mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse
+from mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse
+from mcp.file.v1.file_pb2 import CreateFileResponse
 ```
 
 ### Creating a folder

@@ -1,8 +1,7 @@
 import requests
 from google.protobuf.json_format import MessageToJson, Parse
-from operand.v1.index_pb2 import CreateIndexRequest, CreateIndexResponse, DeleteIndexRequest, DeleteIndexResponse
-from operand.v1.object_pb2 import UpsertRequest, UpsertResponse, DeleteRequest, DeleteResponse, SearchWithinRequest, SearchWithinResponse, Properties, Property, Filter, Condition
-
+from mcp.file.v1.file_pb2 import CreateFileRequest, CreateFileResponse, GetFileRequest, GetFileResponse, ListFilesRequest, ListFilesResponse, DeleteFileRequest, DeleteFileResponse, UpdateFileRequest, UpdateFileResponse, Property, Properties
+from mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse, Filter, Condition
 class OperandClient:
     """
     Used as a base class to provide common functionality for the various
@@ -11,7 +10,7 @@ class OperandClient:
 
     def __init__(self, endpoint, key):
         self.key = key
-        self.endpoint = endpoint
+        self.endpoint = endpoint or "https://mcp.operand.ai"
         if not self.endpoint.endswith("/"):
             self.endpoint += "/"
     
@@ -21,69 +20,75 @@ class OperandClient:
         Returns the response body, and throws if the response is not 200.
         """
         url = self.endpoint + service + "/" + method
-        headers = {"Authorization": self.key, "Content-Type": "application/json"}
+        headers = {"Authorization": "Key "+ self.key, "Content-Type": "application/json"}
         if extra_headers:
             headers.update(extra_headers)
         body = MessageToJson(body, preserving_proto_field_name=True, indent=None)
         resp = requests.post(url, headers=headers, data=body)
         if resp.status_code != 200:
             raise Exception("Operand request failed: " + resp.text)
-        return Parse(resp.text, resp_message)
+        return Parse(resp.text, resp_message, ignore_unknown_fields=True)
 
 
-class IndexClient(OperandClient):
+class FileServiceClient(OperandClient):
     """
-    Access the Index service, which allows users to create and manage their indexes.
+    Access the File service, which provides access to the file operations of the API.
     """
 
     def __init__(self, endpoint, key):
         super().__init__(endpoint, key)
     
     def _req(self, method, body, resp_message):
-        return super()._req("operand.v1.IndexService", method, body, resp_message)
+        return super()._req("mcp.file.v1.FileService", method, body, resp_message)
     
-    def create_index(self, req: CreateIndexRequest) -> CreateIndexResponse:
+    def create_file(self, req: CreateFileRequest) -> CreateFileResponse:
         """
-        Creates a new index.
+        Creates a new file.
         """
-        return self._req("CreateIndex", req, CreateIndexResponse())
+        return self._req("CreateFile", req, CreateFileResponse())
     
-    def delete_index(self, req: DeleteIndexRequest) -> DeleteIndexResponse:
+    def get_file(self, req: GetFileRequest) -> GetFileResponse:
         """
-        Deletes an index.
+        Gets a file.
         """
-        return self._req("DeleteIndex", req, DeleteIndexResponse())
+        return self._req("GetFile", req, GetFileResponse())
+    
+    def list_files(self, req: ListFilesRequest) -> ListFilesResponse:
+        """
+        Lists files.
+        """
+        return self._req("ListFiles", req, ListFilesResponse())
+    
+    def delete_file(self, req: DeleteFileRequest) -> DeleteFileResponse:
+        """
+        Deletes a file.
+        """
+        return self._req("DeleteFile", req, DeleteFileResponse())
 
-class ObjectService(OperandClient):
+    def update_file(self, req: UpdateFileRequest) -> UpdateFileResponse:
+        """
+        Updates a file.
+        """
+        return self._req("UpdateFile", req, UpdateFileResponse())
+
+
+class OperandServiceClient(OperandClient):
     """
-    Access the Object service, which allows users to manage the contents of an index,
-    in addition to performing operations on the index.
+    Access the Operand service, which provides access to the main operations of the API.
     """
 
-    def __init__(self, endpoint, key, index_id):
+    def __init__(self, endpoint, key):
         super().__init__(endpoint, key)
-        self.index_id = index_id
     
     def _req(self, method, body, resp_message):
-        return super()._req("operand.v1.ObjectService", method, body, resp_message, {"Operand-Index-ID": self.index_id})
-    
-    def upsert(self, req: UpsertRequest) -> UpsertResponse:
+        return super()._req("mcp.operand.v1.OperandService", method, body, resp_message)
+
+    def search(self, req: SearchRequest) -> SearchResponse:
         """
-        Upserts an object into the index.
+        Searches files.
         """
-        return self._req("Upsert", req, UpsertResponse())
-    
-    def delete(self, req: DeleteRequest) -> DeleteResponse:
-        """
-        Deletes an object from the index.
-        """
-        return self._req("Delete", req, DeleteResponse())
-    
-    def search_within(self, req: SearchWithinRequest) -> SearchWithinResponse:
-        """
-        Performs a search within the index.
-        """
-        return self._req("SearchWithin", req, SearchWithinResponse())
+        return self._req("Search", req, SearchResponse())
+
 
 def construct_property_internal(value):
     prop = Property()

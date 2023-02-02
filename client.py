@@ -40,16 +40,6 @@ class CreateFileRequest:
         self.parent_id = parent_id        
         self.file = file
         self.properties = properties
-    
-class CreateFileResponse:
-    """
-    A special multipart-form request to create a file.
-    """
-    def __init__(self, id, name, parent_id, properties=None):
-        self.id = id
-        self.name = name
-        self.parent_id = parent_id
-        self.properties = properties
 
 
 class FileServiceClient(OperandClient):

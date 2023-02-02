@@ -13,14 +13,14 @@ pip install operand
 ### Required Imports (for Below Examples)
 
 ```python
-from operand.client import FileServiceClient, OperandServiceClient, CreateFileRequest, CreateFileResponse, add_property, add_property_filter_condition, add_range_condition
+from operand.client import FileServiceClient, OperandServiceClient, CreateFileRequest, add_property, add_property_filter_condition, add_range_condition
 from operand.mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse
 ```
 
 ### Creating a folder
 
 ```python
-client = FileServiceClient("https://mcp.operand.ai/","API_KEY")
+client = FileServiceClient("https://mcp.operand.ai","API_KEY")
 req = CreateFileRequest(
     # Names must be unique within a given folder
     name="cool folder",
@@ -32,7 +32,7 @@ print(resp)
 ### Uploading a file
 
 ```python
-client = FileServiceClient("https://mcp.operand.ai/","API_KEY")
+client = FileServiceClient("https://mcp.operand.ai","API_KEY")
 req = CreateFileRequest(
     # Names must be unique within a given folder
     name="test.txt",
@@ -51,7 +51,7 @@ print(resp)
 ### Searching over all folders (with Optional Filters)
 
 ```python
-client = OperandServiceClient("https://mcp.operand.ai/","API_KEY")
+client = OperandServiceClient("https://mcp.operand.ai","API_KEY")
 req = SearchRequest()
 req.query = "test"
 add_property_filter_condition(req, "my-number-array", 3)

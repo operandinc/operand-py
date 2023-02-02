@@ -56,6 +56,6 @@ req = SearchRequest()
 req.query = "test"
 add_property_filter_condition(req, "my-number-array", 3)
 add_range_condition(req, "my-number", gt=10)
-resp = oclient.search(req)
+resp = client.search(req)
 print(resp)
 ```

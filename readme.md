@@ -13,6 +13,7 @@ pip install operand
 ### Required Imports (for Below Examples)
 
 ```python
+import os
 from operand.client import FileServiceClient, OperandServiceClient, CreateFileRequest, add_property, add_property_filter_condition, add_range_condition
 from operand.mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse
 ```
@@ -20,7 +21,7 @@ from operand.mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse
 ### Creating a folder
 
 ```python
-client = FileServiceClient("https://mcp.operand.ai","API_KEY")
+client = FileServiceClient("https://mcp.operand.ai", os.getenv("OPERAND_API_KEY"))
 req = CreateFileRequest(
     # Names must be unique within a given folder
     name="cool folder",
@@ -29,13 +30,14 @@ resp = client.create_file(req)
 print(resp)
 ```
 
-### Uploading a file
+### Uploading a file to a specific folder
 
 ```python
-client = FileServiceClient("https://mcp.operand.ai","API_KEY")
+client = FileServiceClient("https://mcp.operand.ai", os.getenv("OPERAND_API_KEY"))
 req = CreateFileRequest(
     # Names must be unique within a given folder
     name="test.txt",
+    parent_id="FOLDER_ID",
     # The file contents as bytes
     file=bytes("test", "utf-8")
 )
@@ -48,12 +50,13 @@ resp = client.create_file(req)
 print(resp)
 ```
 
-### Searching over all folders (with Optional Filters)
+### Searching over a specific folder (with Optional Filters)
 
 ```python
-client = OperandServiceClient("https://mcp.operand.ai","API_KEY")
+client = OperandServiceClient("https://mcp.operand.ai", os.getenv("OPERAND_API_KEY"))
 req = SearchRequest()
 req.query = "test"
+req.parent_id = "FOLDER_ID"
 add_property_filter_condition(req, "my-number-array", 3)
 add_range_condition(req, "my-number", gt=10)
 resp = client.search(req)

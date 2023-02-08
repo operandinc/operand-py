@@ -16,7 +16,7 @@ pip install operand
 import os
 from operand.client import FileServiceClient, OperandServiceClient, CreateFileRequest, add_property, add_property_filter_condition, add_range_condition
 from mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse
-from mcp.file.v1.file_pb2 import CreateFileResponse
+from mcp.file.v1.file_pb2 import CreateFileResponse, GetFileRequest, DeleteFileRequest, FileSelector
 ```
 
 ### Creating a folder
@@ -61,5 +61,50 @@ req.parent_id = "FOLDER_ID"
 add_property_filter_condition(req, "my-number-array", 3)
 add_range_condition(req, "my-number", gt=10)
 resp = client.search(req)
+print(resp)
+```
+
+### Getting a file by ID
+
+```python
+client = FileServiceClient("https://mcp.operand.ai", os.getenv("OPERAND_API_KEY"))
+# Get a file
+req = GetFileRequest(
+    selector = FileSelector(
+        id = "FILE_ID"
+    )
+)
+resp = client.get_file(req)
+print(resp)
+```
+
+### Getting a file by name
+
+```python
+client = FileServiceClient("https://mcp.operand.ai", os.getenv("OPERAND_API_KEY"))
+# Get a file
+req = GetFileRequest(
+    selector = FileSelector(
+        by_name = FileSelector.ByName(
+            name = "FILE_NAME",
+            parent_id = "" # root folder
+        )
+    )
+)
+resp = client.get_file(req)
+print(resp)
+```
+
+### Deleting a file by ID
+
+```python
+client = FileServiceClient("https://mcp.operand.ai", os.getenv("OPERAND_API_KEY"))
+# Get a file
+req = DeleteFileRequest(
+    selector = FileSelector(
+       id = "FILE_ID"
+    )
+)
+resp = client.delete_file(req)
 print(resp)
 ```

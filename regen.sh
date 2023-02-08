@@ -4,3 +4,4 @@
 
 rm -rf mcp/
 buf generate buf.build/operand/mcp
+# Make sure to ad ... before the imports in file and operand generated files.

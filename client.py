@@ -26,8 +26,9 @@ class OperandClient:
             headers.update(extra_headers)
         body = MessageToJson(body, preserving_proto_field_name=True, indent=None)
         resp = requests.post(url, headers=headers, data=body)
-        resp.raise_for_status()  # raises exception when not a 2xx response
-        if resp.status_code != 204:
+        if resp.status_code >= 400:
+            raise Exception("Error: " + resp.text)
+        elif resp.status_code != 204:
             return Parse(resp.text, resp_message, ignore_unknown_fields=True)
 
 class CreateFileRequest:

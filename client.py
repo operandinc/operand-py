@@ -1,7 +1,7 @@
 import requests
 from google.protobuf.json_format import MessageToJson, Parse
 from mcp.file.v1.file_pb2 import GetFileRequest, GetFileResponse, ListFilesRequest, ListFilesResponse, DeleteFileRequest, DeleteFileResponse, UpdateFileRequest, UpdateFileResponse, Property, Properties, CreateFileResponse
-from mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse, Filter, Condition
+from mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse, Filter, Condition, ConverseRequest, ConverseResponse
 
 class OperandClient:
     """
@@ -128,6 +128,11 @@ class OperandServiceClient(OperandClient):
         if not req.parent_id:
             req.parent_id = ""
         return self._req("Search", req, SearchResponse())
+    def converse(self, req: ConverseRequest) -> ConverseResponse:
+        """
+        Conversation with Operand.
+        """
+        return self._req("Converse", req, ConverseResponse())
 
 
 def construct_property_internal(value):

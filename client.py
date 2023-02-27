@@ -1,6 +1,6 @@
 import requests
 from google.protobuf.json_format import MessageToJson, Parse
-from mcp.file.v1.file_pb2 import GetFileRequest, GetFileResponse, ListFilesRequest, ListFilesResponse, DeleteFileRequest, DeleteFileResponse, UpdateFileRequest, UpdateFileResponse, Property, Properties, CreateFileResponse
+from mcp.file.v1.file_pb2 import GetFileRequest, GetFileResponse, ListFilesRequest, ListFilesResponse, DeleteFileRequest, DeleteFileResponse, UpdateFileRequest, UpdateFileResponse, Property, Properties, CreateFileResponse, ImportFromURLRequest, ImportFromURLResponse, AttachSyncRequest, AttachSyncResponse, DeleteSyncRequest, DeleteSyncResponse
 from mcp.operand.v1.operand_pb2 import SearchRequest, SearchResponse, Filter, Condition, ConverseRequest, ConverseResponse
 
 class OperandClient:
@@ -107,6 +107,21 @@ class FileServiceClient(OperandClient):
         Updates a file.
         """
         return self._req("UpdateFile", req, UpdateFileResponse())
+    def import_from_url(self, req: ImportFromURLRequest) -> ImportFromURLResponse:
+        """
+        Imports a file from a URL.
+        """
+        return self._req("ImportFromURL", req, ImportFromURLResponse())
+    def attach_sync(self, req: AttachSyncRequest) -> AttachSyncResponse:
+        """
+        Attaches a sync to a file.
+        """
+        return self._req("AttachSync", req, AttachSyncResponse())
+    def delete_sync(self, req: DeleteSyncRequest) -> DeleteSyncResponse:
+        """
+        Deletes a sync.
+        """
+        return self._req("DeleteSync", req, DeleteSyncResponse())
 
 
 class OperandServiceClient(OperandClient):
